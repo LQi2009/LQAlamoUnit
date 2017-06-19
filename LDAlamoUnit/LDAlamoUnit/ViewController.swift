@@ -15,6 +15,8 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
         
         LDAlamoUnit.setRequestEncoding(.Text)
+        LDAlamoUnit.setBaseURLString("urlBaseString")
+        LDAlamoUnit.setHTTPHeaders(["header": "value"])
 //        LDAlamoUnit.post("http://testuser.artup.com/artup-user-api/f/login", parameters: ["mobile": "18310246496", "pwd": "123456"], success: { (json) in
 //            
 //            print(json)

@@ -386,23 +386,37 @@ private extension LDAlamoUnit {
 }
 //MARK: - Public Method
 extension LDAlamoUnit {
-    // 添加身份验证
+    
+    /// 添加身份验证, 用于发送请求是验证身份
+    ///
+    /// - Parameters:
+    ///   - user: 用户名
+    ///   - password: 用户密码
     class func authenticate(withUser user: String, password: String) {
         
         LDAlamoUnit.unit.user = user
         LDAlamoUnit.unit.password = password
     }
     
+    /// 基础URL
+    ///
+    /// - Parameter string: 基础URL链接地址
     class func setBaseURLString(_ string: String) {
         
         LDAlamoUnit.unit.baseUrlString = string
     }
     
+    /// 请求参数的编码格式
+    ///
+    /// - Parameter type: 编码格式
     class func setRequestEncoding(_ type: LDRequestEncoding) {
         
         LDAlamoUnit.unit.requestEncoding = type
     }
     
+    /// 请求头
+    ///
+    /// - Parameter headers: 请求头字典
     class func setHTTPHeaders(_ headers: [String: String]) {
         
         for (key, value) in headers {
@@ -411,26 +425,68 @@ extension LDAlamoUnit {
         }
     }
     
+    /// Get请求
+    ///
+    /// - Parameters:
+    ///   - urlString: URL地址
+    ///   - parameters: 请求参数
+    ///   - success: 成功回调
+    ///   - failure: 失败回调
     class func get(_ urlString: String, parameters: [String: Any]? = nil, success : @escaping LDAlamoUnit_requestSucessHandle, failure: @escaping LDAlamoUnit_requestFailedHandle) {
         
         LDAlamoUnit.unit.request(urlString: urlString, method: .Get, params: parameters, success: success, failure: failure)
     }
     
+    /// Post请求
+    ///
+    /// - Parameters:
+    ///   - urlString: URL地址
+    ///   - parameters: 请求参数
+    ///   - success: 成功回调
+    ///   - failure: 失败回调
     class func post(_ urlString: String, parameters: [String: Any], success : @escaping LDAlamoUnit_requestSucessHandle, failure: @escaping LDAlamoUnit_requestFailedHandle) {
         
         LDAlamoUnit.unit.request(urlString: urlString, method: .Post, params: parameters, success: success, failure: failure)
     }
     
+    /// 下载
+    ///
+    /// - Parameters:
+    ///   - urlString: 下载URL
+    ///   - parameters: 请求参数
+    ///   - to: 保存位置
+    ///   - resumData: 断点已下载数据
+    ///   - success: 成功回调
+    ///   - failure: 失败回调
+    ///   - progress: 下载进度
     class func download(from urlString: String, parameters: [String: String], saveTo to: String, resumData: Data?=nil, success: @escaping LDAlamoUnit_downloadSuccessHandle, failure: @escaping LDAlamoUnit_downloadFailedHandle, progressHandle progress: @escaping LDAlamoUnit_progressHandle) {
         
         LDAlamoUnit.unit.downLoad(urlString: urlString, parameters: parameters, to: to, resumData: resumData, successs: success, failure: failure, progressHandle: progress)
     }
     
+    /// 上传文件
+    ///
+    /// - Parameters:
+    ///   - fileURL: 需要上传的文件地址
+    ///   - urlString: 上传到的地址
+    ///   - method: 上传方式, 默认Post
+    ///   - success: 成功的回调
+    ///   - failure: 失败的回调
+    ///   - progressHandle:上传进度
     class func uploadFile(fileURL: URL, to urlString: String, method: LDHTTPType = .Post, success: @escaping LDAlamoUnit_requestSucessHandle, failure: @escaping LDAlamoUnit_requestFailedHandle, progressHandle:  LDAlamoUnit_progressHandle?) {
         
         LDAlamoUnit.unit.uploadFile(fileURL: fileURL, to: urlString, method: method, success: success, failure: failure, progressHandle: progressHandle)
     }
     
+    /// 上传Data数据
+    ///
+    /// - Parameters:
+    ///   - data: 待上传的数据
+    ///   - urlString: 上传的URL
+    ///   - method: 上传方式, 默认Post
+    ///   - success: 成功的回调
+    ///   - failure: 失败的回调
+    ///   - progressHandle: 进度回调
     class func uploadData(data: Data, to urlString: String, method: LDHTTPType = .Post, success: @escaping LDAlamoUnit_requestSucessHandle, failure: @escaping LDAlamoUnit_requestFailedHandle, progressHandle: LDAlamoUnit_progressHandle? = nil) {
         
         LDAlamoUnit.unit.uploadData(data: data, to: urlString, method: method, success: success, failure: failure, progressHandle: progressHandle)
@@ -446,6 +502,15 @@ extension LDAlamoUnit {
         LDAlamoUnit.unit.uploadFiles(to: urlString, params: params, name: name, datas: datas, method: method, success: success, failure: failure, progressHandle: progressHandle)
     }
     
+    /// 已文件流的形式上传文件
+    ///
+    /// - Parameters:
+    ///   - urlString: 上传URL
+    ///   - path: 文件路径
+    ///   - method: 上传方式, 默认Post
+    ///   - success: 成功回调
+    ///   - failure: 失败回调
+    ///   - progressHandle: 进度回调
     class func uploadFileStream(to urlString: String, filePath path: String, httpMethod method: LDHTTPType = .Post,success: @escaping LDAlamoUnit_requestSucessHandle, failure: @escaping LDAlamoUnit_requestFailedHandle, progressHandle: LDAlamoUnit_progressHandle? = nil) {
         
         LDAlamoUnit.unit.uploadFileStream(to: urlString, filePath: path, httpMethod: method, success: success, failure: failure, progressHandle: progressHandle)
