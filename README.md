@@ -44,7 +44,7 @@ LDAlamoUnit.setHTTPHeaders(["header": "value"])
 发送Post请求:
 
 ```Swift
-        LDAlamoUnit.post("http://testuser.artup.com/artup-user-api/f/login", parameters: ["mobile": "18310246496", "pwd": "123456"], success: { (json) in
+        LDAlamoUnit.post("http://", parameters: ["mobile": "23345", "pwd": "123456"], success: { (json) in
             
             print(json)
         }) { (error) in
@@ -56,7 +56,7 @@ LDAlamoUnit.setHTTPHeaders(["header": "value"])
 发送Get请求:
 
 ```Swift
-LDAlamoUnit.get("http://testuser.artup.com/artup-user-api/f/login", parameters: ["mobile": "18310246496", "pwd": "123456"], success: { (json) in
+LDAlamoUnit.get("http://", parameters: ["mobile": "23456", "pwd": "123456"], success: { (json) in
             print(json)
         }) { (error) in
             print(error)
