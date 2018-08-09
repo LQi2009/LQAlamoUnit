@@ -5,6 +5,11 @@
 //  Created by LiuQiqiang on 2018/6/30.
 //  Copyright © 2018年 LiuQiqiang. All rights reserved.
 //
+/*
+ Author：LiuQiqiang
+ GitHub：https://github.com/LQi2009/LQAlamoUnit
+ QQ：302934443
+ */
 
 import UIKit
 import Alamofire
