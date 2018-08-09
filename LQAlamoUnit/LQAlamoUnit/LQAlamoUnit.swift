@@ -224,6 +224,7 @@ extension LQAlamoUnit {
     }
     
     static var currentNetworkStatus: LQNetworkStatus {
+        
         guard let rs = LQAlamoUnit.unit.reachabilityManager?.networkReachabilityStatus else { return .unknown }
         
         var status: LQNetworkStatus = .unknown
@@ -243,6 +244,7 @@ extension LQAlamoUnit {
     }
     
     class func startNetworkObserver(_ closure: @escaping (_ status: LQNetworkStatus) -> Void) {
+        
         LQAlamoUnit.unit.reachabilityManager?.listener = { status in
             
             switch status {
