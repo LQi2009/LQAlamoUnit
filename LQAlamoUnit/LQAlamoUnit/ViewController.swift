@@ -14,13 +14,13 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        LQAlamoUnit.startNetworkObserver { (state) in
-            print(state)
-        }
+//        LQAlamoUnit.startNetworkObserver { (state) in
+//            print(state)
+//        }
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        print(LQAlamoUnit.currentNetworkStatus)
+//        print(LQAlamoUnit.currentNetworkStatus)
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
