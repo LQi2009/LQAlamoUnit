@@ -1,21 +1,30 @@
-# LDAlamoUnit
+# LQAlamoUnit
 
 基于Alamofire/SwiftyJSON的网络请求封装
 
 # 说明
-简单封装了Get与Post请求, 并使用SwiftyJSON来解析数据:
+简单封装了get与post请求, 并使用SwiftyJSON来解析数据:
 
 ```Swift
-enum LDHTTPType {
-    case Get, Post
+/// 网络请求方式
+///
+/// - get: get
+/// - post: post
+enum LQRequestType {
+    case get, post
 }
 ```
 
-这里只设置了请求参数的编码格式:
+这里只设置了请求参数的编码格式(返回数据格式统一为json):
 
 ```Swift
-enum LDRequestEncoding {
-    case Json, Text, Plist
+/// 网络请求参数编码方式
+///
+/// - json: json
+/// - text: text
+/// - plist: plist属性列表
+enum LQRequestEncoding {
+    case json, text, plist
 }
 ```
 
@@ -26,25 +35,34 @@ enum LDRequestEncoding {
 一些配置的方法, 调用一次即可, 不用每次发请求的时候都调用, 例如:
 ```Swift
 
-class func setBaseURLString(_ string: String)
-class func setRequestEncoding(_ type: LDRequestEncoding)
-class func setHTTPHeaders(_ headers: [String: String])
+    /// 基础URL
+    ///
+    /// - Parameter string: 基础URL链接地址
+    class func setBaseURLString(_ string: String)
+    /// 请求参数的编码格式
+    ///
+    /// - Parameter type: 编码格式
+    class func setRequestEncoding(_ type: LQRequestEncoding)
+    /// 请求头
+    ///
+    /// - Parameter headers: 请求头字典
+    class func setHTTPHeaders(_ headers: [String: String])
 ...
 ```
 
 # 使用
-
+### 发送请求
 使用的时候, 可全局一次性配置一些参数设置信息, 只需要设置一次:
 ```Swift
-LDAlamoUnit.setRequestEncoding(.Text)
-LDAlamoUnit.setBaseURLString("urlBaseString")
-LDAlamoUnit.setHTTPHeaders(["header": "value"])
+LQAlamoUnit.setRequestEncoding(.text)
+LQAlamoUnit.setBaseURLString("urlBaseString")
+LQAlamoUnit.setHTTPHeaders(["header": "value"])
 ```
 
 发送Post请求:
 
 ```Swift
-        LDAlamoUnit.post("http://", parameters: ["mobile": "23345", "pwd": "123456"], success: { (json) in
+        LQAlamoUnit.post("http://", parameters: ["mobile": "23345", "pwd": "123456"], success: { (json) in
             
             print(json)
         }) { (error) in
@@ -56,11 +74,26 @@ LDAlamoUnit.setHTTPHeaders(["header": "value"])
 发送Get请求:
 
 ```Swift
-LDAlamoUnit.get("http://", parameters: ["mobile": "23456", "pwd": "123456"], success: { (json) in
+LQAlamoUnit.get("http://", parameters: ["mobile": "23456", "pwd": "123456"], success: { (json) in
             print(json)
         }) { (error) in
             print(error)
         }
 
 ```
+
+### 监听网络状态
+```
+
+LQAlamoUnit.startNetworkObserver { (state) in
+            print(state)
+}
+```
+获取当前网络状态
+```
+
+print(LQAlamoUnit.currentNetworkStatus)
+```
+        
+
 其他接口, 可直接查看//MARK: - Public Method部分的extension分类的方法及注释.
