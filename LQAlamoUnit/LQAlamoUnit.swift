@@ -19,7 +19,7 @@ import SwiftyJSON
 ///
 /// - get: get
 /// - post: post
-enum LQRequestType {
+public enum LQRequestType {
     case get, post
 }
 
@@ -28,7 +28,7 @@ enum LQRequestType {
 /// - json: json
 /// - text: text
 /// - plist: plist属性列表
-enum LQRequestEncoding {
+public enum LQRequestEncoding {
     case json, text, plist
 }
 
@@ -38,7 +38,7 @@ enum LQRequestEncoding {
 /// - wwan: wwan 流量
 /// - unknown: 网络未知
 /// - no: 无网络
-enum LQNetworkStatus {
+public enum LQNetworkStatus {
     case wifi, wwan, unknown, no
 }
 
@@ -56,7 +56,7 @@ extension LQAlamoUnit {
     /// - Parameters:
     ///   - user: 用户名
     ///   - password: 用户密码
-    class func authenticate(withUser user: String, password: String) {
+    public class func authenticate(withUser user: String, password: String) {
         
         LQAlamoUnit.unit.user = user
         LQAlamoUnit.unit.password = password
@@ -65,7 +65,7 @@ extension LQAlamoUnit {
     /// 基础URL
     ///
     /// - Parameter string: 基础URL链接地址
-    class func setBaseURLString(_ string: String) {
+    public class func setBaseURLString(_ string: String) {
         
         LQAlamoUnit.unit.baseUrlString = string
     }
@@ -73,7 +73,7 @@ extension LQAlamoUnit {
     /// 请求参数的编码格式
     ///
     /// - Parameter type: 编码格式
-    class func setRequestEncoding(_ type: LQRequestEncoding) {
+    public class func setRequestEncoding(_ type: LQRequestEncoding) {
         
         LQAlamoUnit.unit.requestEncoding = type
     }
@@ -81,7 +81,7 @@ extension LQAlamoUnit {
     /// 请求头
     ///
     /// - Parameter headers: 请求头字典
-    class func setHTTPHeaders(_ headers: [String: String]) {
+    public class func setHTTPHeaders(_ headers: [String: String]) {
         
         for (key, value) in headers {
             
@@ -96,7 +96,7 @@ extension LQAlamoUnit {
     ///   - parameters: 请求参数
     ///   - success: 成功回调
     ///   - failure: 失败回调
-    class func get(_ urlString: String, parameters: [String: Any]? = nil, success : @escaping LQAlamoUnit_requestSucessHandle, failure: @escaping LQAlamoUnit_requestFailedHandle) {
+    public class func get(_ urlString: String, parameters: [String: Any]? = nil, success : @escaping LQAlamoUnit_requestSucessHandle, failure: @escaping LQAlamoUnit_requestFailedHandle) {
         
         LQAlamoUnit.unit.request(urlString: urlString, method: .get, params: parameters, success: success, failure: failure)
     }
@@ -108,7 +108,7 @@ extension LQAlamoUnit {
     ///   - parameters: 请求参数
     ///   - success: 成功回调
     ///   - failure: 失败回调
-    class func post(_ urlString: String, parameters: [String: Any], success : @escaping LQAlamoUnit_requestSucessHandle, failure: @escaping LQAlamoUnit_requestFailedHandle) {
+    public class func post(_ urlString: String, parameters: [String: Any], success : @escaping LQAlamoUnit_requestSucessHandle, failure: @escaping LQAlamoUnit_requestFailedHandle) {
         
         LQAlamoUnit.unit.request(urlString: urlString, method: .post, params: parameters, success: success, failure: failure)
     }
@@ -123,7 +123,7 @@ extension LQAlamoUnit {
     ///   - success: 成功回调
     ///   - failure: 失败回调
     ///   - progress: 下载进度
-    class func download(from urlString: String, parameters: [String: String], saveTo to: String, resumData: Data?=nil, success: @escaping LQAlamoUnit_downloadSuccessHandle, failure: @escaping LQAlamoUnit_downloadFailedHandle, progressHandle progress: @escaping LQAlamoUnit_progressHandle) {
+    public class func download(from urlString: String, parameters: [String: String], saveTo to: String, resumData: Data?=nil, success: @escaping LQAlamoUnit_downloadSuccessHandle, failure: @escaping LQAlamoUnit_downloadFailedHandle, progressHandle progress: @escaping LQAlamoUnit_progressHandle) {
         
         LQAlamoUnit.unit.downLoad(urlString: urlString, parameters: parameters, to: to, resumData: resumData, successs: success, failure: failure, progressHandle: progress)
     }
@@ -137,7 +137,7 @@ extension LQAlamoUnit {
     ///   - success: 成功的回调
     ///   - failure: 失败的回调
     ///   - progressHandle:上传进度
-    class func uploadFile(fileURL: URL, to urlString: String, method: LQRequestType = .post, success: @escaping LQAlamoUnit_requestSucessHandle, failure: @escaping LQAlamoUnit_requestFailedHandle, progressHandle:  LQAlamoUnit_progressHandle?) {
+    public class func uploadFile(fileURL: URL, to urlString: String, method: LQRequestType = .post, success: @escaping LQAlamoUnit_requestSucessHandle, failure: @escaping LQAlamoUnit_requestFailedHandle, progressHandle:  LQAlamoUnit_progressHandle?) {
         
         LQAlamoUnit.unit.uploadFile(fileURL: fileURL, to: urlString, method: method, success: success, failure: failure, progressHandle: progressHandle)
     }
@@ -151,7 +151,7 @@ extension LQAlamoUnit {
     ///   - success: 成功的回调
     ///   - failure: 失败的回调
     ///   - progressHandle: 进度回调
-    class func uploadData(data: Data, to urlString: String, method: LQRequestType = .post, success: @escaping LQAlamoUnit_requestSucessHandle, failure: @escaping LQAlamoUnit_requestFailedHandle, progressHandle: LQAlamoUnit_progressHandle? = nil) {
+    public class func uploadData(data: Data, to urlString: String, method: LQRequestType = .post, success: @escaping LQAlamoUnit_requestSucessHandle, failure: @escaping LQAlamoUnit_requestFailedHandle, progressHandle: LQAlamoUnit_progressHandle? = nil) {
         
         LQAlamoUnit.unit.uploadData(data: data, to: urlString, method: method, success: success, failure: failure, progressHandle: progressHandle)
     }
@@ -167,7 +167,7 @@ extension LQAlamoUnit {
     ///   - success: 成功的回调
     ///   - failure: 失败的回调
     ///   - progressHandle: 进度回调
-    class func upLoadImages(to urlString: String, params:[String:String], name: String, datas: [Data], method: LQRequestType = .post, success: @escaping LQAlamoUnit_requestSucessHandle, failure: @escaping LQAlamoUnit_requestFailedHandle, progressHandle: LQAlamoUnit_progressHandle? = nil) {
+    public class func upLoadImages(to urlString: String, params:[String:String], name: String, datas: [Data], method: LQRequestType = .post, success: @escaping LQAlamoUnit_requestSucessHandle, failure: @escaping LQAlamoUnit_requestFailedHandle, progressHandle: LQAlamoUnit_progressHandle? = nil) {
         
         LQAlamoUnit.unit.upLoadImages(to: urlString, params: params, name: name, datas: datas, method: method, success: success, failure: failure, progressHandle: progressHandle)
     }
@@ -183,7 +183,7 @@ extension LQAlamoUnit {
     ///   - success: 成功的回调
     ///   - failure: 失败的回调
     ///   - progressHandle: 进度回调
-    class func uploadFiles(to urlString: String, params:[String:String],name: String, datas: [Any], method: LQRequestType = .post, success: @escaping LQAlamoUnit_requestSucessHandle, failure: @escaping LQAlamoUnit_requestFailedHandle, progressHandle: LQAlamoUnit_progressHandle? = nil) {
+    public class func uploadFiles(to urlString: String, params:[String:String],name: String, datas: [Any], method: LQRequestType = .post, success: @escaping LQAlamoUnit_requestSucessHandle, failure: @escaping LQAlamoUnit_requestFailedHandle, progressHandle: LQAlamoUnit_progressHandle? = nil) {
         
         LQAlamoUnit.unit.uploadFiles(to: urlString, params: params, name: name, datas: datas, method: method, success: success, failure: failure, progressHandle: progressHandle)
     }
@@ -197,7 +197,7 @@ extension LQAlamoUnit {
     ///   - success: 成功回调
     ///   - failure: 失败回调
     ///   - progressHandle: 进度回调
-    class func uploadFileStream(to urlString: String, filePath path: String, httpMethod method: LQRequestType = .post,success: @escaping LQAlamoUnit_requestSucessHandle, failure: @escaping LQAlamoUnit_requestFailedHandle, progressHandle: LQAlamoUnit_progressHandle? = nil) {
+    public class func uploadFileStream(to urlString: String, filePath path: String, httpMethod method: LQRequestType = .post,success: @escaping LQAlamoUnit_requestSucessHandle, failure: @escaping LQAlamoUnit_requestFailedHandle, progressHandle: LQAlamoUnit_progressHandle? = nil) {
         
         LQAlamoUnit.unit.uploadFileStream(to: urlString, filePath: path, httpMethod: method, success: success, failure: failure, progressHandle: progressHandle)
     }
@@ -206,24 +206,24 @@ extension LQAlamoUnit {
 //MARK: - 网络状态监控
 extension LQAlamoUnit {
     
-    static var isWWANEnable: Bool {
+    public static var isWWANEnable: Bool {
         
         guard let rs = LQAlamoUnit.unit.reachabilityManager?.isReachableOnWWAN else { return false }
         return rs
     }
     
-    static var isNetEnable: Bool {
+    public static var isNetEnable: Bool {
         guard let rs = LQAlamoUnit.unit.reachabilityManager?.isReachable else { return false }
         return rs
     }
     
-    static var isWifiEnable: Bool {
+    public static var isWifiEnable: Bool {
         
         guard let rs = LQAlamoUnit.unit.reachabilityManager?.isReachableOnEthernetOrWiFi else { return false }
         return rs
     }
     
-    static var currentNetworkStatus: LQNetworkStatus {
+    public static var currentNetworkStatus: LQNetworkStatus {
         
         guard let rs = LQAlamoUnit.unit.reachabilityManager?.networkReachabilityStatus else { return .unknown }
         
@@ -243,7 +243,7 @@ extension LQAlamoUnit {
         return status
     }
     
-    class func startNetworkObserver(_ closure: @escaping (_ status: LQNetworkStatus) -> Void) {
+    public class func startNetworkObserver(_ closure: @escaping (_ status: LQNetworkStatus) -> Void) {
         
         LQAlamoUnit.unit.reachabilityManager?.listener = { status in
             
@@ -262,7 +262,7 @@ extension LQAlamoUnit {
         LQAlamoUnit.unit.reachabilityManager?.startListening()
     }
     
-    class func stopNetworkObserver() {
+    public class func stopNetworkObserver() {
         LQAlamoUnit.unit.reachabilityManager?.stopListening()
     }
 }
