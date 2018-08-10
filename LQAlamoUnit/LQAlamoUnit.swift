@@ -42,11 +42,11 @@ public enum LQNetworkStatus {
     case wifi, wwan, unknown, no
 }
 
-typealias LQAlamoUnit_requestSucessHandle = (_ response: JSON) -> Void
-typealias LQAlamoUnit_requestFailedHandle = (_ error: Error) -> Void
-typealias LQAlamoUnit_downloadSuccessHandle = (_ data: Data, _ path: String) -> Void
-typealias LQAlamoUnit_downloadFailedHandle = (_ error: Error, _ data: Data?) -> Void
-typealias LQAlamoUnit_progressHandle = (_ progress: Double) -> Void
+public typealias LQAlamoUnit_requestSucessHandle = (_ response: JSON) -> Void
+public typealias LQAlamoUnit_requestFailedHandle = (_ error: Error) -> Void
+public typealias LQAlamoUnit_downloadSuccessHandle = (_ data: Data, _ path: String) -> Void
+public typealias LQAlamoUnit_downloadFailedHandle = (_ error: Error, _ data: Data?) -> Void
+public typealias LQAlamoUnit_progressHandle = (_ progress: Double) -> Void
 
 //MARK: - Public Method
 extension LQAlamoUnit {
@@ -267,7 +267,7 @@ extension LQAlamoUnit {
     }
 }
 
-class LQAlamoUnit {
+public class LQAlamoUnit {
     
     fileprivate static var unit: LQAlamoUnit = LQAlamoUnit()
     private init() { }
