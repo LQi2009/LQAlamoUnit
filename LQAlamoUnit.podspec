@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "LQAlamoUnit"
-  s.version      = "1.0.2"
+  s.version      = "1.0.3"
   s.summary      = "基于Alamofire/SwiftyJSON的网络请求封装"
 
   # This description is used to generate tags and improve search results.
