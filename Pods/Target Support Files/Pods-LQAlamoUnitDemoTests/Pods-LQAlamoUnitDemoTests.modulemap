@@ -1,0 +1,6 @@
+framework module Pods_LQAlamoUnitDemoTests {
+  umbrella header "Pods-LQAlamoUnitDemoTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
