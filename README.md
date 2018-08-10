@@ -2,7 +2,19 @@
 
 基于Alamofire/SwiftyJSON的网络请求封装
 
-# 说明
+# 安装
+##### 手动
+将 LQAlamoUnit 文件夹内文件直接拖入项目即可，同时需要添加Alamofire/SwiftyJSON
+
+##### Cocoapos
+在Podfile文件中添加
+```
+pod 'LQAlamoUnit', '~> 1.1.0'
+```
+
+执行 pod install 即可！
+
+# 使用
 简单封装了get与post请求, 并使用SwiftyJSON来解析数据:
 
 ```Swift
