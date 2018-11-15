@@ -19,13 +19,21 @@ class ViewController: UIViewController {
             print(status)
         }
         
-        LQAlamoUnit.setRequestEncoding(.json)
         LQAlamoUnit.post("http://192.168.68.94:8207/forward/getStyleList", parameters: ["loginId": "1ce1c2469e9241ddb9e6", "storeId": "401"], success: { (json) in
             print(json)
             print(Thread.current)
         }) { (error) in
             print(error)
         }
+        
+        let req = LQAlamoUnit.post("http://192.168.68.94:8207/forward/getStyleList", parameters: ["loginId": "1ce1c2469e9241ddb9e6", "storeId": "401"], success: { (json) in
+            print(json)
+            print(Thread.current)
+        }) { (error) in
+            print(error)
+        }
+        // 请求取消，会打印异常
+        req.cancel()
     }
 
     override func didReceiveMemoryWarning() {
