@@ -161,11 +161,11 @@ extension LQAlamoUnit {
     /// - Returns: 请求实例，可用于取消当前请求
     @discardableResult
     public class func uploadFile(to urlString: String,
-                          fileURL: URL,
-                          method: LQHTTPMethod = .post,
-                          progressHandler:  LQAlamoUnit_progressHandler?,
-                          success: @escaping LQAlamoUnit_requestSucessHandler,
-                          failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQUploadRequest {
+                                 fileURL: URL,
+                                 method: LQHTTPMethod = .post,
+                                 progressHandler:  LQAlamoUnit_progressHandler?,
+                                 success: @escaping LQAlamoUnit_requestSucessHandler,
+                                 failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQUploadRequest {
         
         return __uploadFile(to: urlString,
                             fileURL: fileURL,
@@ -187,11 +187,11 @@ extension LQAlamoUnit {
     /// - Returns: 请求实例，可用于取消当前请求
     @discardableResult
     public class func uploadData(to urlString: String,
-                          data: Data,
-                          method: LQHTTPMethod = .post,
-                          progressHandler: LQAlamoUnit_progressHandler? = nil,
-                          success: @escaping LQAlamoUnit_requestSucessHandler,
-                          failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQUploadRequest {
+                                 data: Data,
+                                 method: LQHTTPMethod = .post,
+                                 progressHandler: LQAlamoUnit_progressHandler? = nil,
+                                 success: @escaping LQAlamoUnit_requestSucessHandler,
+                                 failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQUploadRequest {
         
          return __uploadData(to: urlString,
                              data: data,
@@ -250,18 +250,18 @@ extension LQAlamoUnit {
     /// - Returns: 请求实例，可用于取消当前请求
     @discardableResult
     public class func uploadFileStream(to urlString: String,
-                                filePath path: String,
-                                httpMethod method: LQHTTPMethod = .post,
-                                progressHandler: LQAlamoUnit_progressHandler? = nil,
-                                success: @escaping LQAlamoUnit_requestSucessHandler,
-                                failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQUploadRequest? {
+                                       filePath path: String,
+                                       httpMethod method: LQHTTPMethod = .post,
+                                       progressHandler: LQAlamoUnit_progressHandler? = nil,
+                                       success: @escaping LQAlamoUnit_requestSucessHandler,
+                                       failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQUploadRequest? {
         
         return __uploadFileStream(to: urlString,
-                           filePath: path,
-                           httpMethod: method,
-                           progressHandler: progressHandler,
-                           success: success,
-                           failure: failure)
+                                  filePath: path,
+                                  httpMethod: method,
+                                  progressHandler: progressHandler,
+                                  success: success,
+                                  failure: failure)
     }
 }
 
@@ -409,15 +409,18 @@ private extension LQAlamoUnit {
     /// - Returns: 请求实例，可用于取消当前请求
     @discardableResult
     class func __uploadFile(to urlString: String,
-                                   fileURL: URL,
-                                   method: LQHTTPMethod = .post,
-                                   progressHandler:  LQAlamoUnit_progressHandler?,
-                                   success: @escaping LQAlamoUnit_requestSucessHandler,
-                                   failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQUploadRequest {
+                            fileURL: URL,
+                            method: LQHTTPMethod = .post,
+                            progressHandler:  LQAlamoUnit_progressHandler?,
+                            success: @escaping LQAlamoUnit_requestSucessHandler,
+                            failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQUploadRequest {
         
         let requestCharaters = self.verifyCharacter(urlString: urlString, method: method)
         
-        return Alamofire.upload(fileURL, to: urlString, method: requestCharaters.1, headers: requestCharaters.3).uploadProgress { (progress) in
+        return Alamofire.upload(fileURL,
+                                to: urlString,
+                                method: requestCharaters.1,
+                                headers: requestCharaters.3).uploadProgress { (progress) in
             
             if let progressHandle = progressHandler {
                 progressHandle(progress.fractionCompleted)
@@ -448,15 +451,18 @@ private extension LQAlamoUnit {
     /// - Returns: 请求实例，可用于取消当前请求
     @discardableResult
     class func __uploadData(to urlString: String,
-                                   data: Data,
-                                   method: LQHTTPMethod = .post,
-                                   progressHandler: LQAlamoUnit_progressHandler? = nil,
-                                   success: @escaping LQAlamoUnit_requestSucessHandler,
-                                   failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQUploadRequest {
+                            data: Data,
+                            method: LQHTTPMethod = .post,
+                            progressHandler: LQAlamoUnit_progressHandler? = nil,
+                            success: @escaping LQAlamoUnit_requestSucessHandler,
+                            failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQUploadRequest {
         
         let requestCharaters = self.verifyCharacter(urlString: urlString, method: method)
         
-        let req = Alamofire.upload(data, to: requestCharaters.0, method: requestCharaters.1, headers: requestCharaters.3).uploadProgress { (progress) in
+        let req = Alamofire.upload(data,
+                                   to: requestCharaters.0,
+                                   method: requestCharaters.1,
+                                   headers: requestCharaters.3).uploadProgress { (progress) in
             
             if let progressHandle = progressHandler {
                 progressHandle(progress.fractionCompleted)
@@ -505,7 +511,9 @@ private extension LQAlamoUnit {
         var headers = requestCharaters.3
         headers["content-type"] = "multipart/form-data"
         
-        let req = Alamofire.upload(stream, to: urlString, method: requestCharaters.1, headers: headers).uploadProgress(closure: { (progress) in
+        let req = Alamofire.upload(stream, to: urlString,
+                                   method: requestCharaters.1,
+                                   headers: headers).uploadProgress(closure: { (progress) in
             
             if let progressHandle = progressHandler {
                 
@@ -543,15 +551,15 @@ private extension LQAlamoUnit {
     ///   - success: 成功的回调
     ///   - failure: 失败的回调
     class func __uploadMutipartData(to urlString: String,
-                     params:[String:String],
-                     name: String,
-                     mimeType: String = "image/jpeg",
-                     files: [Any],
-                     method: LQHTTPMethod = .post,
-                     uploadRequestHandler: LQAlamoUnit_uploadRequestHandler? = nil,
-                     progressHandler: LQAlamoUnit_progressHandler? = nil,
-                     success: @escaping LQAlamoUnit_requestSucessHandler,
-                     failure: @escaping LQAlamoUnit_requestFailedHandler) {
+                                    params:[String:String],
+                                    name: String,
+                                    mimeType: String = "image/jpeg",
+                                    files: [Any],
+                                    method: LQHTTPMethod = .post,
+                                    uploadRequestHandler: LQAlamoUnit_uploadRequestHandler? = nil,
+                                    progressHandler: LQAlamoUnit_progressHandler? = nil,
+                                    success: @escaping LQAlamoUnit_requestSucessHandler,
+                                    failure: @escaping LQAlamoUnit_requestFailedHandler) {
         
         let requestCharaters = self.verifyCharacter(urlString: urlString, method: method)
         
@@ -677,12 +685,12 @@ extension LQAlamoUnit {
     ///   - failure: 失败回调
     /// - Returns: 请求实例，可用于取消当前请求
     private class func __download(from urlString: String,
-                  parameters: [String: String]? = nil,
-                  saveTo path: String? = nil,
-                  resumData: Data? = nil,
-                  progressHandler: LQAlamoUnit_progressHandler? = nil,
-                  successs: @escaping LQAlamoUnit_downloadSuccessHandler,
-                  failure: @escaping LQAlamoUnit_downloadFailedHandler) -> LQDownloadRequest {
+                                  parameters: [String: String]? = nil,
+                                  saveTo path: String? = nil,
+                                  resumData: Data? = nil,
+                                  progressHandler: LQAlamoUnit_progressHandler? = nil,
+                                  successs: @escaping LQAlamoUnit_downloadSuccessHandler,
+                                  failure: @escaping LQAlamoUnit_downloadFailedHandler) -> LQDownloadRequest {
         
         
         var destination: DownloadRequest.DownloadFileDestination = DownloadRequest.suggestedDownloadDestination(for: .documentDirectory)
@@ -703,14 +711,21 @@ extension LQAlamoUnit {
             }
         }
         
-        let requestCharaters = self.verifyCharacter(urlString: urlString, method: .get)
+        let requestCharaters = self.verifyCharacter(urlString: urlString,
+                                                    method: .get)
         
         let request: DownloadRequest
         
         if let resumData = resumData {
-            request = Alamofire.download(resumingWith: resumData, to: destination)
+            request = Alamofire.download(resumingWith: resumData,
+                                         to: destination)
         } else {
-            request = Alamofire.download(requestCharaters.0, method: requestCharaters.1, parameters: parameters, encoding: requestCharaters.2, headers: requestCharaters.3, to: destination)
+            request = Alamofire.download(requestCharaters.0,
+                                         method: requestCharaters.1,
+                                         parameters: parameters,
+                                         encoding: requestCharaters.2,
+                                         headers: requestCharaters.3,
+                                         to: destination)
         }
         
         request.responseData { (response) in
@@ -747,12 +762,13 @@ private extension LQAlamoUnit {
     ///   - failure: 失败的回调
     /// - Returns: 请求实例，可用于取消当前请求
     class func __request(urlString: String,
-                 method: LQHTTPMethod,
-                 params : [String : Any]? = nil,
-                 success : @escaping LQAlamoUnit_requestSucessHandler,
-                 failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQRequest {
+                         method: LQHTTPMethod,
+                         params : [String : Any]? = nil,
+                         success : @escaping LQAlamoUnit_requestSucessHandler,
+                         failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQRequest {
         
-        let requestCharaters = self.verifyCharacter(urlString: urlString, method: method)
+        let requestCharaters = self.verifyCharacter(urlString: urlString,
+                                                    method: method)
         
         let dataRequest: DataRequest
         // 带有验证
@@ -762,10 +778,21 @@ private extension LQAlamoUnit {
                 headers[authHeader.key] = authHeader.value
             }
             
-            dataRequest = Alamofire.request(requestCharaters.0, method: requestCharaters.1, parameters: params, encoding: requestCharaters.2, headers: requestCharaters.3)
-                .validate().authenticate(user: user, password: psw, persistence: URLCredential.Persistence.forSession)
+            dataRequest = Alamofire.request(requestCharaters.0,
+                                            method: requestCharaters.1,
+                                            parameters: params,
+                                            encoding: requestCharaters.2,
+                                            headers: requestCharaters.3
+                )
+                .validate().authenticate(user: user,
+                                         password: psw,
+                                         persistence: URLCredential.Persistence.forSession)
         } else {
-            dataRequest = Alamofire.request(requestCharaters.0, method: requestCharaters.1, parameters: params, encoding: requestCharaters.2, headers: requestCharaters.3)
+            dataRequest = Alamofire.request(requestCharaters.0,
+                                            method: requestCharaters.1,
+                                            parameters: params,
+                                            encoding: requestCharaters.2,
+                                            headers: requestCharaters.3)
                 .validate()
         }
 
@@ -798,9 +825,9 @@ private extension LQAlamoUnit {
     }
     
     class func LQLog<T>(message: T,
-                              file: String = #file,
-                              method: String = #function,
-                              line: Int = #line)
+                        file: String = #file,
+                        method: String = #function,
+                        line: Int = #line)
     {
         #if DEBUG
         print("\((file as NSString).lastPathComponent)[\(line)], \(method): \(message)")
