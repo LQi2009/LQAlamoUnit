@@ -19,21 +19,31 @@ class ViewController: UIViewController {
             print(status)
         }
         
-        LQAlamoUnit.post("http://192.168.68.94:8207/forward/getStyleList", parameters: ["loginId": "1ce1c2469e9241ddb9e6", "storeId": "401"], success: { (json) in
-            print(json)
+        LQAlamoUnit.config(baseURL: nil, requestEncoding: .json, isCachePostResponse: true, isCacheGetResponse: true, isUseLocalCacheWhenRequestFailed: true)
+        
+        LQAlamoUnit.post("http://192.168.68.94:8207/forward/getStyleList", parameters: ["loginId": "1ce1c2469e9241ddb9e6", "storeId": "401"], success: { (res) in
+            // 获取JSON格式
+            res.responseJSON({ (json) in
+                print(json)
+            })
+            // 获取字符串格式
+            res.responseText({ (str) in
+                
+            })
+            
             print(Thread.current)
         }) { (error) in
             print(error)
         }
         
-        let req = LQAlamoUnit.post("http://192.168.68.94:8207/forward/getStyleList", parameters: ["loginId": "1ce1c2469e9241ddb9e6", "storeId": "401"], success: { (json) in
-            print(json)
-            print(Thread.current)
-        }) { (error) in
-            print(error)
-        }
-        // 请求取消，会打印异常
-        req.cancel()
+//        let req = LQAlamoUnit.post("http://192.168.68.94:8207/forward/getStyleList", parameters: ["loginId": "1ce1c2469e9241ddb9e6", "storeId": "401"], success: { (json) in
+//            print(json)
+//            print(Thread.current)
+//        }) { (error) in
+//            print(error)
+//        }
+//        // 请求取消，会打印异常
+//        req.cancel()
     }
 
     override func didReceiveMemoryWarning() {

@@ -45,7 +45,7 @@ public enum LQNetworkStatus {
 public typealias LQUploadRequest = UploadRequest
 public typealias LQDownloadRequest = DownloadRequest
 public typealias LQRequest = DataRequest
-public typealias LQAlamoUnit_requestSucessHandler = (_ response: JSON) -> Void
+public typealias LQAlamoUnit_requestSucessHandler = (_ response: LQResponse) -> Void
 public typealias LQAlamoUnit_requestFailedHandler = (_ error: Error) -> Void
 public typealias LQAlamoUnit_downloadSuccessHandler = (_ data: Data, _ path: String) -> Void
 public typealias LQAlamoUnit_downloadFailedHandler = (_ error: Error, _ data: Data?) -> Void
@@ -61,11 +61,23 @@ extension LQAlamoUnit {
     /// - Parameters:
     ///   - urlString: 基本URL地址
     ///   - req: 请求参数编码方式, 默认.json
-    public class func config(baseURL urlString: String,
-                requestEncoding req: LQRequestEncoding = .json) {
+    ///   - timeoutInterval: 超时时间
+    ///   - isCachePost: 是否缓存post请求数据
+    ///   - isCacheGet: 是否缓存get请求数据
+    ///   - isUseLocal: 当请求失败时，是否使用本地已缓存的数据（如果有缓存）
+    public class func config(baseURL urlString: String? = nil,
+                             requestEncoding req: LQRequestEncoding = .json,
+                             timeoutInterval: TimeInterval = 60,
+                             isCachePostResponse isCachePost: Bool = false,
+                             isCacheGetResponse isCacheGet: Bool = false,
+                             isUseLocalCacheWhenRequestFailed isUseLocal: Bool = false) {
         
         baseUrlString = urlString
         requestEncoding = req
+        self.timeoutInterval = timeoutInterval
+        self.isCacheGet = isCacheGet
+        self.isCachePost = isCachePost
+        self.isUseLocalCacheWhenRequestFailed = isUseLocal
     }
     
     /// 设置请求头
@@ -107,6 +119,29 @@ extension LQAlamoUnit {
         requestEncoding = type
     }
     
+    public class func totalCachedSize() -> Double{
+        
+        return __totalCacheSize()
+    }
+
+    /// 清除本地已缓存的数据
+    ///
+    /// - Parameter maxSize: 缓存的最大数据量，单位兆(M)
+    /// 当大于此值时才会清除缓存，传0则不限制，调用时就清除
+    public class func clearCaches(_ maxSize: Double) {
+        
+        if maxSize <= 0 {
+            __clearCache()
+        } else {
+            let cacheSize = totalCachedSize()
+            if cacheSize > maxSize {
+                __clearCache()
+            }
+        }
+        
+    }
+    
+    
     /// get请求
     ///
     /// - Parameters:
@@ -119,7 +154,7 @@ extension LQAlamoUnit {
     public class func get(_ urlString: String,
                           parameters: [String: Any]? = nil,
                           success : @escaping LQAlamoUnit_requestSucessHandler,
-                          failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQRequest {
+                          failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQRequest? {
         
         return __request(urlString: urlString,
                                  method: .get,
@@ -140,7 +175,7 @@ extension LQAlamoUnit {
     public class func post(_ urlString: String,
                            parameters: [String: Any],
                            success : @escaping LQAlamoUnit_requestSucessHandler,
-                           failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQRequest {
+                           failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQRequest? {
         
         return __request(urlString: urlString,
                                  method: .post,
@@ -343,6 +378,14 @@ public class LQAlamoUnit {
     fileprivate static var user: String?
     fileprivate static var password: String?
     
+    fileprivate static var isCacheGet: Bool = false
+    fileprivate static var isCachePost: Bool = false
+    fileprivate static var isUseLocalCacheWhenRequestFailed: Bool = false
+    fileprivate static var timeoutInterval: TimeInterval = 60 {
+        didSet{
+            Alamofire.SessionManager.default.session.configuration.timeoutIntervalForRequest = timeoutInterval
+        }
+    }
     /// 网络监控
     private static var reachabilityManager = Alamofire.NetworkReachabilityManager.init()
     
@@ -417,7 +460,7 @@ private extension LQAlamoUnit {
         
         let requestCharaters = self.verifyCharacter(urlString: urlString, method: method)
         
-        return Alamofire.upload(fileURL,
+        let req = Alamofire.upload(fileURL,
                                 to: urlString,
                                 method: requestCharaters.1,
                                 headers: requestCharaters.3).uploadProgress { (progress) in
@@ -425,18 +468,11 @@ private extension LQAlamoUnit {
             if let progressHandle = progressHandler {
                 progressHandle(progress.fractionCompleted)
             }
-            }.responseJSON { (response) in
-                
-                switch response.result {
-                case .success:
-                    if let value = response.result.value {
-                        let json = JSON(value)
-                        success(json)
-                    }
-                case .failure(let error):
-                    failure(error)
-                }
-        }
+            }
+        
+        let res = LQResponse(req, requestFailedHandler: failure)
+        success(res)
+        return req
     }
     
     /// 一般上传文件方式，适合上传数据量不大的文件
@@ -467,18 +503,10 @@ private extension LQAlamoUnit {
             if let progressHandle = progressHandler {
                 progressHandle(progress.fractionCompleted)
             }
-            }.responseJSON { (response) in
-                
-                switch response.result {
-                case .success:
-                    if let value = response.result.value {
-                        let json = JSON(value)
-                        success(json)
-                    }
-                case .failure(let error):
-                    failure(error)
-                }
         }
+        
+        let res = LQResponse(req, requestFailedHandler: failure)
+        success(res)
         
         return req
     }
@@ -520,20 +548,10 @@ private extension LQAlamoUnit {
                 progressHandle(progress.fractionCompleted)
                 
             }
-        }).responseJSON { (response) in
-            
-            switch response.result {
-            case .success:
-                if let value = response.result.value {
-                    let json = JSON(value)
-                    success(json)
-                }
-            case .failure(let error):
-                failure(error)
-            }
-        }
+        })
         
-        
+        let res = LQResponse(req, requestFailedHandler: failure)
+        success(res)
         return req
     }
     
@@ -644,22 +662,14 @@ private extension LQAlamoUnit {
                     upR(upload)
                 }
                 
-                upload.responseJSON { response in
-                    switch response.result {
-                    case .success:
-                        if let value = response.result.value {
-                            let json = JSON(value)
-                            success(json)
-                        }
-                    case .failure(let error):
-                        failure(error)
-                    }
-                    }.uploadProgress(closure: { (progress) in
+                upload.uploadProgress(closure: { (progress) in
                     if let progressHandle = progressHandler {
                         progressHandle(progress.fractionCompleted)
                     }
                 })
                 
+                let res = LQResponse(upload, requestFailedHandler: failure)
+                success(res)
                 
             case .failure(let encodingError):
                 failure(encodingError)
@@ -765,7 +775,18 @@ private extension LQAlamoUnit {
                          method: LQHTTPMethod,
                          params : [String : Any]? = nil,
                          success : @escaping LQAlamoUnit_requestSucessHandler,
-                         failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQRequest {
+                         failure: @escaping LQAlamoUnit_requestFailedHandler) -> LQRequest? {
+        
+        let netState = LQAlamoUnit.currentNetworkStatus
+        if netState == .no {
+            if (method == .get && isCacheGet) || (method == .post && isCachePost) {
+                
+                let res = LQResponse(nil, requestFailedHandler: failure, url: urlString, params: params)
+                
+                success(res)
+                return nil
+            }
+        }
         
         let requestCharaters = self.verifyCharacter(urlString: urlString,
                                                     method: method)
@@ -777,6 +798,8 @@ private extension LQAlamoUnit {
             if let authHeader = Request.authorizationHeader(user: user, password: psw) {
                 headers[authHeader.key] = authHeader.value
             }
+            
+            
             
             dataRequest = Alamofire.request(requestCharaters.0,
                                             method: requestCharaters.1,
@@ -796,22 +819,9 @@ private extension LQAlamoUnit {
                 .validate()
         }
 
-        dataRequest.responseJSON { (response) in
-            
-            switch response.result{
-            case .success:
-                if let value = response.result.value {
-                    let json = JSON(value)
-                    success(json)
-                }
-            case .failure(let error):
-                //                     let err = error as NSError
-                //                     if err.code == NSURLErrorCancelled {
-                //
-                //                     }
-                failure(error)
-            }
-        }
+        let res = LQResponse.init(dataRequest, requestFailedHandler: failure, url: urlString, params: params)
+        
+        success(res)
         
         return dataRequest
     }
@@ -832,5 +842,454 @@ private extension LQAlamoUnit {
         #if DEBUG
         print("\((file as NSString).lastPathComponent)[\(line)], \(method): \(message)")
         #endif
+    }
+}
+
+
+public struct LQResponse {
+    
+    private var req: DataRequest?
+    private var requestFailedHandler : LQAlamoUnit_requestFailedHandler?
+    
+    private var urlString : String?
+    private var params : [String: Any]?
+    
+    init(_ obj: DataRequest?, requestFailedHandler : LQAlamoUnit_requestFailedHandler?, url: String? = nil, params: [String: Any]? = nil) {
+        self.req = obj
+        self.requestFailedHandler = requestFailedHandler
+        self.urlString = url
+        self.params = params
+    }
+    
+    public func responseJSON(_ handler: @escaping (_ obj: JSON) -> Void) {
+        
+        guard req != nil else {
+            
+            if let url = urlString {
+                if let res = LQAlamoUnit.cacheResponseOf(url, params: params) {
+                    
+                    let json = JSON(res)
+                    handler(json)
+                }
+            }
+            
+            return
+        }
+        
+        req?.responseJSON { (response) in
+            
+            switch response.result {
+            case .success:
+                if let value = response.result.value {
+                    let json = JSON(value)
+                    
+                    handler(json)
+                    self.cacheResponse(value)
+                } else {
+                    handler("Request success, but none data response")
+                }
+                
+            case .failure(let error):
+                //                     let err = error as NSError
+                //                     if err.code == NSURLErrorCancelled {
+                //
+                //                     }
+                
+                if LQAlamoUnit.isUseLocalCacheWhenRequestFailed && (LQAlamoUnit.isCachePost || LQAlamoUnit.isCacheGet) {
+                    if let url = self.urlString, let obj = LQAlamoUnit.cacheResponseOf(url, params: self.params) {
+                        let json = JSON(obj)
+                        handler(json)
+                    } else {
+                        self.requestFailedHandler?(error)
+                    }
+                } else {
+                    self.requestFailedHandler?(error)
+                }
+            }
+        }
+    }
+    
+    public func responseText(_ handler: @escaping (_ obj: String?) -> Void) {
+        
+        guard req != nil else {
+            
+            if let url = urlString {
+                if let res = LQAlamoUnit.cacheResponseOf(url, params: params) as? String {
+                    
+                    handler(res)
+                }
+            }
+            
+            return
+        }
+        
+        req?.responseString { (response) in
+            switch response.result {
+            case .success:
+                if let value = response.result.value {
+                    
+                    handler(value)
+                    self.cacheResponse(value)
+                } else {
+                    handler(nil)
+                }
+            case .failure(let error):
+                
+                if LQAlamoUnit.isUseLocalCacheWhenRequestFailed && (LQAlamoUnit.isCachePost || LQAlamoUnit.isCacheGet) {
+                    if let url = self.urlString, let obj = LQAlamoUnit.cacheResponseOf(url, params: self.params) as? String {
+                        
+                        handler(obj)
+                    } else {
+                        self.requestFailedHandler?(error)
+                    }
+                } else {
+                    self.requestFailedHandler?(error)
+                }
+            }
+        }
+    }
+    
+    public func responseList(_ handler: @escaping (_ obj: Any?) -> Void) {
+        
+        guard req != nil else {
+            
+            if let url = urlString {
+                if let res = LQAlamoUnit.cacheResponseOf(url, params: params) {
+                    
+                    handler(res)
+                }
+            }
+            
+            return
+        }
+        
+        req?.responsePropertyList { (response) in
+            switch response.result {
+            case .success:
+                if let value = response.result.value {
+                    
+                    handler(value)
+                    self.cacheResponse(value)
+                } else {
+                    handler(nil)
+                }
+            case .failure(let error):
+                if LQAlamoUnit.isUseLocalCacheWhenRequestFailed && (LQAlamoUnit.isCachePost || LQAlamoUnit.isCacheGet) {
+                    if let url = self.urlString, let obj = LQAlamoUnit.cacheResponseOf(url, params: self.params) {
+                        
+                        handler(obj)
+                    } else {
+                        self.requestFailedHandler?(error)
+                    }
+                } else {
+                    self.requestFailedHandler?(error)
+                }
+            }
+        }
+    }
+    
+    public func responseData(_ handler: @escaping (_ obj: Data?) -> Void) {
+        
+        guard req != nil else {
+            
+            if let url = urlString {
+                if let res = LQAlamoUnit.cacheResponseOf(url, params: params) as? Data {
+                    
+                    handler(res)
+                }
+            }
+            
+            return
+        }
+        
+        req?.responseData { (response) in
+            switch response.result{
+            case .success:
+                if let value = response.result.value {
+                    
+                    handler(value)
+                    self.cacheResponse(value)
+                } else {
+                    
+                }
+            case .failure(let error):
+                
+                if LQAlamoUnit.isUseLocalCacheWhenRequestFailed && (LQAlamoUnit.isCachePost || LQAlamoUnit.isCacheGet) {
+                    if let url = self.urlString, let obj = LQAlamoUnit.cacheResponseOf(url, params: self.params) as? Data {
+                        
+                        handler(obj)
+                    } else {
+                        self.requestFailedHandler?(error)
+                    }
+                } else {
+                    self.requestFailedHandler?(error)
+                }
+            }
+        }
+    }
+    
+    public func response(_ handler: @escaping (_ obj: Data?) -> Void) {
+        
+        guard req != nil else {
+            
+            if let url = urlString {
+                if let res = LQAlamoUnit.cacheResponseOf(url, params: params) as? Data {
+                    
+                    handler(res)
+                }
+            }
+            
+            return
+        }
+        
+        req?.response(completionHandler: { (response) in
+            
+            if let error = response.error {
+                
+                if LQAlamoUnit.isUseLocalCacheWhenRequestFailed && (LQAlamoUnit.isCachePost || LQAlamoUnit.isCacheGet) {
+                    if let url = self.urlString, let obj = LQAlamoUnit.cacheResponseOf(url, params: self.params) as? Data {
+                        
+                        handler(obj)
+                    } else {
+                        self.requestFailedHandler?(error)
+                    }
+                } else {
+                    self.requestFailedHandler?(error)
+                }
+                
+            } else {
+                self.cacheResponse(response.data)
+                handler(response.data)
+            }
+        })
+    }
+    
+    private func cacheResponse(_ obj: Any?) {
+        
+        guard let url = urlString else { return }
+        
+        if (LQAlamoUnit.isCachePost) || ( LQAlamoUnit.isCacheGet) {
+            
+            LQAlamoUnit.cacheResponseObj(obj, url: url, params: params)
+        }
+    }
+}
+
+
+
+private extension LQAlamoUnit {
+    
+    class func __clearCache() {
+        
+        let path = cachePath()
+        let fm = FileManager.default
+        if fm.fileExists(atPath: path) {
+            try? fm.removeItem(atPath: path)
+        }
+    }
+    
+    class func __totalCacheSize() -> Double {
+        
+        let dirPath = cachePath()
+        let fm = FileManager.default
+        
+        var isDir: ObjCBool = false
+        if fm.fileExists(atPath: dirPath, isDirectory: &isDir) {
+            
+            if isDir.boolValue {
+                
+                guard let paths = try? fm.contentsOfDirectory(atPath: dirPath) else {return 0 }
+                
+                var total: Double = 0
+                
+                for subPath in paths {
+                    let path = dirPath + "/" + subPath
+
+                    if let info = try? fm.attributesOfItem(atPath: path) {
+                        if let size = info[FileAttributeKey.size] as? Double {
+                            
+                            total += size
+                        }
+                    }
+                }
+                
+                return total / (1024.0 * 1024.0)
+            }
+        }
+        
+        return 0
+    }
+    
+    class func cachePath() -> String {
+        
+        return NSHomeDirectory() + "/Documents/LQAlamoUnitCaches"
+    }
+    
+    class func absoluteUrlWithPath(_ path: String) -> String {
+        if path.count == 0 {
+            
+            guard let base = baseUrlString else {return ""}
+            guard base.count > 0 else {return ""}
+            
+            return base
+        }
+        
+        guard let base = baseUrlString else { return path }
+        guard base.count > 0 else { return path }
+        
+        var absoluteUrl = path
+        
+        if path.hasPrefix("http://") == false && path.hasPrefix("https://") == false {
+            
+            if base.hasSuffix("/") {
+                if path.hasPrefix("/") {
+                    absoluteUrl.removeFirst()
+                    absoluteUrl = base + absoluteUrl
+                } else {
+                    absoluteUrl = base + absoluteUrl
+                }
+            } else {
+                if path.hasPrefix("/") {
+                    absoluteUrl = base + absoluteUrl
+                } else {
+                    absoluteUrl = base + "/" + absoluteUrl
+                }
+            }
+        }
+        
+        return absoluteUrl
+    }
+    
+    class func uniqueFileName(_ url: String, params: [String: Any]?) -> String {
+        
+        var url = url
+        
+        if url.hasPrefix("http") == false {
+            if let ul = baseUrlString {
+                url = ul + url
+            }
+        }
+        
+        guard let param = params else { return url.md5 }
+        
+        if param.count <= 0 {
+            return url.md5
+        }
+        
+        if let data = try? JSONSerialization.data(withJSONObject: param, options: .prettyPrinted) {
+            
+            if let str = String(data: data, encoding: .utf8) {
+                var unique = url + str
+                //                unique = unique.trimmingCharacters(in: .whitespacesAndNewlines)
+                
+                unique = unique.replacingOccurrences(of: " ", with: "")
+                unique = unique.replacingOccurrences(of: "\n", with: "")
+                
+                LQLog(message: unique)
+                //                LQLog(message: s)
+                return unique.md5
+            }
+        }
+        
+        var unique = url
+        
+        for (key, value) in param {
+            
+            if value is Dictionary<String, Any> {
+                continue
+            } else if value is Array<Any> {
+                continue
+            }
+            
+            unique += unique + key + "\(value)"
+        }
+        
+        return unique.md5
+    }
+    
+    class func cacheResponseObj(_ obj: Any?, url: String, params: [String: Any]?) {
+        
+        guard let obj = obj else { return }
+        
+        if url.count > 0 {
+            
+            let path = cachePath()
+            let fm = FileManager.default
+            
+            if fm.fileExists(atPath: path) == false {
+                
+                do {
+                    try fm.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
+                } catch let error {
+                    
+                    LQLog(message: error)
+                    return
+                }
+            }
+            
+            let key = uniqueFileName(url, params: params)
+            let filePath = path + "/" + key
+            var data: Data?
+            
+            if let dt = obj as? Data {
+                data = dt
+            } else {
+                
+                if JSONSerialization.isValidJSONObject(obj) {
+                    if let dt = try? JSONSerialization.data(withJSONObject: obj, options: .prettyPrinted) {
+                        data = dt
+                    }
+                } else if let text = obj as? String {
+                    
+                    if let dt = Data(base64Encoded: text) {
+                        data = dt
+                    }
+                }
+                
+            }
+            
+            if let dt = data {
+                
+                let ok = fm.createFile(atPath: filePath, contents: dt, attributes: nil)
+                
+                if ok {
+                    LQLog(message: "cache file for \(url)/n filePath: \(filePath)")
+                }
+            }
+        }
+    }
+    
+    class func cacheResponseOf(_ url: String, params: [String: Any]?) -> Any? {
+        
+        guard url.count > 0 else {
+            return nil
+        }
+        
+        let path = cachePath()
+        let key = uniqueFileName(url, params: params)
+        let filePath = path + "/" + key
+        
+        return FileManager.default.contents(atPath: filePath)
+    }
+}
+
+private extension String {
+    
+    var md5: String {
+        
+        let str = self.cString(using: String.Encoding.utf8)
+        let strLen = CC_LONG(self.lengthOfBytes(using: String.Encoding.utf8))
+        let digestLen = Int(CC_MD5_DIGEST_LENGTH)
+        let result = UnsafeMutablePointer<CUnsignedChar>.allocate(capacity: digestLen)
+        
+        CC_MD5(str!, strLen, result)
+        
+        let hash = NSMutableString()
+        for i in 0..<digestLen {
+            hash.appendFormat("%02x", result[i])
+        }
+        
+        result.deallocate()
+        return String(format: hash as String)
     }
 }

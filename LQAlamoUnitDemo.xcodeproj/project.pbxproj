@@ -61,6 +61,7 @@
 		D2021820211C7EF600EDF8A4 /* LQAlamoUnitDemoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LQAlamoUnitDemoUITests.swift; sourceTree = "<group>"; };
 		D2021822211C7EF600EDF8A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D21255E1211D2F8900C2BE79 /* LQAlamoUnit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LQAlamoUnit.swift; sourceTree = "<group>"; };
+		D25CF73F21A2616800A4C898 /* LQAlamoUnitDemo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LQAlamoUnitDemo-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +147,7 @@
 				D2021807211C7EF600EDF8A4 /* Assets.xcassets */,
 				D2021809211C7EF600EDF8A4 /* LaunchScreen.storyboard */,
 				D202180C211C7EF600EDF8A4 /* Info.plist */,
+				D25CF73F21A2616800A4C898 /* LQAlamoUnitDemo-Bridging-Header.h */,
 			);
 			path = LQAlamoUnitDemo;
 			sourceTree = "<group>";
@@ -248,6 +250,7 @@
 				TargetAttributes = {
 					D20217FC211C7EF500EDF8A4 = {
 						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 1010;
 					};
 					D2021810211C7EF600EDF8A4 = {
 						CreatedOnToolsVersion = 9.4.1;
@@ -564,6 +567,7 @@
 			baseConfigurationReference = BD0B5499099226C668D891A6 /* Pods-LQAlamoUnitDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = M5AQP3WXJE;
 				INFOPLIST_FILE = LQAlamoUnitDemo/Info.plist;
@@ -573,6 +577,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.ldshare.LQAlamoUnitDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "LQAlamoUnitDemo/LQAlamoUnitDemo-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -583,6 +589,7 @@
 			baseConfigurationReference = 7280685B46ACFB9C018A468E /* Pods-LQAlamoUnitDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = M5AQP3WXJE;
 				INFOPLIST_FILE = LQAlamoUnitDemo/Info.plist;
@@ -592,6 +599,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.ldshare.LQAlamoUnitDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "LQAlamoUnitDemo/LQAlamoUnitDemo-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
