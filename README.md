@@ -9,13 +9,14 @@
 ##### Cocoapos
 在Podfile文件中添加
 ```
-pod 'LQAlamoUnit', '~> 1.1.0'
+pod 'LQAlamoUnit', '~> 1.5.2'
 ```
 
 执行 pod install 即可！
 
 
 # 版本说明
+
 - 1.5.2
 此版本统一返回数据格式为解析后的JSON，直接添加以下代码即可：
 ```
@@ -64,8 +65,10 @@ LQAlamoUnit.config(isCachePostResponse: true, isCacheGetResponse: true, isUseLoc
 ```
 
 - 1.8.0
+
 此版本在1.6.0基础上增加了post/get接口返回数据缓存
 调用以下方法来设置是否缓存
+
 ```Swift
 LQAlamoUnit.config(isCachePostResponse: true, isCacheGetResponse: true, isUseLocalCacheWhenRequestFailed: true)
 ```
@@ -126,7 +129,6 @@ enum LQRequestEncoding {
 ...
 ```
 
-# 使用
 ### 发送请求
 使用的时候, 可全局一次性配置一些参数设置信息, 只需要设置一次:
 ```Swift
