@@ -14,6 +14,70 @@ pod 'LQAlamoUnit', '~> 1.1.0'
 
 执行 pod install 即可！
 
+
+# 版本说明
+- 1.5.2
+此版本统一返回数据格式为解析后的JSON，直接添加以下代码即可：
+```
+pod 'LQAlamoUnit', '~> 1.5.1'
+```
+
+例如：
+```
+LQAlamoUnit.post("http://host/forward/getStyleList", parameters: ["loginId": "1ce1c2469241ddb9e6", "storeId": "81"], success: { (json) in
+            print(json)
+        }) { (error) in
+            print(error)
+        }
+        
+```
+
+- 1.6.0
+此版本定义了一个返回值的实例 **LQResponse** ，用于获取不同格式化的返回值类型；
+一开始返回值定义为Any，但是在使用的时候很不方便，且导致内部的不同类型获取变得毫无意义，最终使用这种方式来解决，导致在使用时多了一层闭包嵌套，如果有更好的方法，还请赐教：
+```swfit
+LQAlamoUnit.post("http://host/forward/getStyleList", parameters: ["loginId": "1ce1c2469e92db9e6", "storeId": "88"], success: { (res) in
+            // 获取JSON格式
+            res.responseJSON({ (json) in
+                print(json)
+            })
+            // 获取字符串格式
+            res.responseText({ (str) in
+                
+            })
+            
+            print(Thread.current)
+        }) { (error) in
+            print(error)
+        }
+```
+
+- 1.7.0 
+此版本在1.5.2基础上增加了post/get接口返回数据缓存，这里返回的数据格式统一为JSON，使用方式一样，调用以下方法来设置是否缓存
+```Swift
+LQAlamoUnit.config(isCachePostResponse: true, isCacheGetResponse: true, isUseLocalCacheWhenRequestFailed: true)
+```
+
+不过，需要建立桥接文件，并引入头文件
+```
+#import <CommonCrypto/CommonCrypto.h>
+```
+
+- 1.8.0
+此版本在1.6.0基础上增加了post/get接口返回数据缓存
+调用以下方法来设置是否缓存
+```Swift
+LQAlamoUnit.config(isCachePostResponse: true, isCacheGetResponse: true, isUseLocalCacheWhenRequestFailed: true)
+```
+同样需要建立桥接文件，并引入头文件
+```
+#import <CommonCrypto/CommonCrypto.h>
+```
+
+可根据具体情况使用相应的版本
+
+
+
 # 使用
 简单封装了get与post请求, 并使用SwiftyJSON来解析数据:
 
